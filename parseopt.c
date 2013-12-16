@@ -36,7 +36,7 @@ int findopt(char opt, const char* options) {
  */
 parse_option *parseopt(int argc, char *argv[], const char *options) {
 	int argi, argii, opti;
-	const char *arg;
+	char *arg;
 
 	parse_option *head, *tail, *newopt;
 
@@ -50,6 +50,7 @@ parse_option *parseopt(int argc, char *argv[], const char *options) {
 		arg = argv[argi];
 
 		if(arg[0] == '-') {
+			/* Handle option */
 
 			argii = 1;
 
@@ -62,9 +63,26 @@ parse_option *parseopt(int argc, char *argv[], const char *options) {
 				}
 
 				if(options[opti+1] == ':') {
-					newopt = new_parse_option(options[opti], argv[argi+1], argi);
-					argi++;
+					/* The current option expects an argument */
+
+					if(arg[argii+1] == 0) {
+						/* Argument is separate token */
+
+						if(argi + 1 >= argc) {
+							printf("Option %c expected an argument but encountered end of command line!\n", arg[argii]);
+							return NULL;
+						}
+
+						newopt = new_parse_option(options[opti], argv[argi+1], argi);
+						argi++;
+					} else {
+						/* Argument is fused with option */
+						newopt = new_parse_option(options[opti], &(arg[argii+1]), argi);
+						while(arg[argii+1] != 0) { argii++; }
+					}
+
 				} else {
+					/* The current option expects no argument */
 					newopt = new_parse_option(options[opti], NULL, argi);
 				}
 
@@ -79,6 +97,7 @@ parse_option *parseopt(int argc, char *argv[], const char *options) {
 			}
 
 		} else {
+			/* Handle positional argument */
 
 			newopt = new_parse_option(0, argv[argi], argi);
 
