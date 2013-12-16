@@ -13,19 +13,29 @@ int main(int argc, char *argv[]) {
 		opt = opts;
 		opts = opts->next;
 
-		if(opt->option != 0) {
 
-			printf("Option: -%c index %d, ", opt->option, opt->index);
-			
-			if(opt->argument == NULL) {
-				printf("No argument\n");
-			} else {
-				printf("Argument '%s'\n", opt->argument);
-			}
+		switch(opt->option) {
 
-		} else {
-			printf("Argument: %s\n", opt->argument);
+			case 'a':
+			case 'c':
+				printf("Encountered option %c at index %d with argument %s\n", opt->option, opt->index, opt->argument);
+				break;
+
+			case 'b':
+			case 'd':
+			case 'e':
+			case 'f':
+				printf("Encountered option %c at index %d (no arguments)\n", opt->option, opt->index);
+				break;
+
+			case 0:
+				printf("Encountered positional argument '%s'\n", opt->argument);
+				break;
+
+			default:
+				printf("Unknwon option: %c\n", opt->option);
 		}
+
 
 		free(opt);
 	}
